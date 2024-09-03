@@ -28,7 +28,7 @@ class TestGenerated < Minitest::Test
       Generated.generated?(blob, lambda { raise DataLoadedError.new })
     end
     expected = !negate
-    actual = Generated.generated?(blob, lambda { IO.read(blob) })
+    actual = Generated.generated?(blob, lambda { File.read(blob) })
     assert(expected == !!actual, error_message(blob, negate))
   end
 
@@ -93,6 +93,15 @@ class TestGenerated < Minitest::Test
     generated_sample_without_loading_data("Dummy/npm-shrinkwrap.json")
     generated_sample_without_loading_data("Dummy/package-lock.json")
 
+    # pnpm lockfile
+    generated_sample_without_loading_data("Dummy/pnpm-lock.yaml")
+
+    # Yarn Plug'n'Play file
+    generated_sample_without_loading_data(".pnp.js")
+    generated_sample_without_loading_data(".pnp.cjs")
+    generated_sample_without_loading_data(".pnp.mjs")
+    generated_sample_without_loading_data(".pnp.loader.mjs")
+
     # Godep saved dependencies
     generated_sample_without_loading_data("Godeps/Godeps.json")
     generated_sample_without_loading_data("Godeps/_workspace/src/github.com/kr/s3/sign.go")
@@ -143,6 +152,7 @@ class TestGenerated < Minitest::Test
     # Game Maker Studio 2
     generated_sample_loading_data("JSON/GMS2_Project.yyp")
     generated_sample_loading_data("JSON/2ea73365-b6f1-4bd1-a454-d57a67e50684.yy")
+    generated_sample_loading_data("JSON/VCT.yy")
     generated_fixture_loading_data("Generated/options_main.inherited.yy")
 
     # Pipenv
@@ -167,10 +177,56 @@ class TestGenerated < Minitest::Test
     generated_fixture_loading_data("HTML/unknown.html", true)
     generated_fixture_loading_data("HTML/no-content.html", true)
     generated_sample_loading_data("HTML/pages.html")
-    
+
     # GIMP
     generated_fixture_loading_data("C/image.c")
     generated_fixture_loading_data("C/image.h")
 
+    # Haxe
+    generated_fixture_loading_data("Generated/Haxe/main.js")
+    generated_fixture_loading_data("Generated/Haxe/main.py")
+    generated_fixture_loading_data("Generated/Haxe/main.lua")
+    generated_fixture_loading_data("Generated/Haxe/Main.cpp")
+    generated_fixture_loading_data("Generated/Haxe/Main.h")
+    generated_fixture_loading_data("Generated/Haxe/Main.java")
+    generated_fixture_loading_data("Generated/Haxe/Main.cs")
+    generated_fixture_loading_data("Generated/Haxe/Main.php")
+
+    # Cargo
+    generated_sample_without_loading_data("TOML/filenames/Cargo.toml.orig")
+
+    # jOOQ
+    generated_sample_loading_data("Java/generated-jooq-table.java")
+
+    # poetry
+    generated_sample_without_loading_data("TOML/filenames/poetry.lock")
+
+    # pdm
+    generated_sample_without_loading_data("TOML/filenames/pdm.lock")
+
+    # uv
+    generated_sample_without_loading_data("TOML/filenames/uv.lock")
+
+    # coverage.py `coverage html` output
+    generated_sample_without_loading_data("htmlcov/index.html")
+    generated_sample_without_loading_data("htmlcov/coverage_html.js")
+    generated_sample_without_loading_data("htmlcov/style.css")
+    generated_sample_without_loading_data("htmlcov/status.json")
+    generated_sample_without_loading_data("Dummy/htmlcov/index.html")
+    generated_sample_without_loading_data("Dummy/htmlcov/coverage_html.js")
+    generated_sample_without_loading_data("Dummy/htmlcov/style.css")
+    generated_sample_without_loading_data("Dummy/htmlcov/status.json")
+  end
+
+  # We've whitelisted these files on purpose, even though they're machine-generated.
+  # Future contributors won't necessarily know that, so these checks are in-place to
+  # catch PRs that mark these files as generated (and prevent a forgetful maintainer
+  # from approving them).
+  def test_check_not_generated
+    # Jest snapshots (#3579)
+    generated_sample_without_loading_data("Jest Snapshot/css.test.tsx.snap", true)
+
+    # Yarn lockfiles (#4459)
+    generated_sample_without_loading_data("YAML/filenames/yarn.lock", true)
   end
 end
